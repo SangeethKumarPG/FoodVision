@@ -2,6 +2,8 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from classes import class_names
+import tensorflow_hub as hub
+
 
 st.header("Food Vision")
 st.write("Classify the food item from the given image")
@@ -22,8 +24,10 @@ if submitted:
     model_input = tf.keras.layers.Input(shape=(224, 224, 3))
     tfsmlayer = tf.keras.layers.TFSMLayer("food_vision_101_classes/tuned_model", call_endpoint='serving_default')(model_input)
     model = tf.keras.Model(inputs=model_input, outputs=tfsmlayer)
+    # model = tf.keras.models.load_model("food_vision_101_classes.keras", compile=False)
     processed_image = preprocess_image(image)
     pred_probs = model.predict(processed_image).get('softmax_float32')
+    print(pred_probs)
     pred_index = pred_probs.argmax(axis=1)
     st.image(image, width=200)
     st.write(f"## {class_names[pred_index[0]]}")
